@@ -31,11 +31,14 @@ namespace MyLeasing.Web
 
             services.AddDbContext<DataContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-        
+
+            services.AddTransient<SeedDb>();
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, SeedDb seeder)
         {
             if (env.IsDevelopment())
             {
@@ -60,6 +63,9 @@ namespace MyLeasing.Web
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            // CHAMADA AO SEED
+            seeder.SeedAsync().Wait();
         }
     }
 }
