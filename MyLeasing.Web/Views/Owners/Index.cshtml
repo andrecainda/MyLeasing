@@ -1,0 +1,41 @@
+﻿@model IEnumerable<MyLeasing.Web.Models.Owner>
+
+@{
+    ViewData["Title"] = "Owners";
+}
+
+<h1>Owners</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.First().Document)</th>
+            <th>Owner Name</th>
+            <th>@Html.DisplayNameFor(model => model.First().FixedPhone)</th>
+            <th>@Html.DisplayNameFor(model => model.First().CellPhone)</th>
+            <th>@Html.DisplayNameFor(model => model.First().Address)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Document</td>
+                <td>@item.OwnerName</td>
+                <td>@item.FixedPhone</td>
+                <td>@item.CellPhone</td>
+                <td>@item.Address</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
