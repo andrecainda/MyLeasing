@@ -1,65 +1,60 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MyLeasing.Web.Data;
+using MyLeasing.Web.Interfaces;
 using MyLeasing.Web.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MyLeasing.Web.Controllers
 {
     public class OwnersController : Controller
     {
+        private readonly IOwnerRepository _ownerRepository;
+
+        public OwnersController(IOwnerRepository ownerRepository)
+        {
+            _ownerRepository = ownerRepository;
+        }
+        /*
         private readonly DataContext _context;
 
         public OwnersController(DataContext context)
         {
             _context = context;
         }
-
+        */
         // GET: Owners
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Owners.ToListAsync());
+            return View(await _ownerRepository.GetAllAsync());
         }
 
         // GET: Owners/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var owner = await _context.Owners
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (owner == null)
-            {
-                return NotFound();
-            }
+            var owner = await _ownerRepository.GetByIdAsync(id.Value);
+            if (owner == null) return NotFound();
 
             return View(owner);
         }
 
         // GET: Owners/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
+        public IActionResult Create() => View();
 
         // POST: Owners/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Document,FirstName,LastName,FixedPhone,CellPhone,Address")] Owner owner)
+        public async Task<IActionResult> Create(Owner owner)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(owner);
-                await _context.SaveChangesAsync();
+                await _ownerRepository.AddAsync(owner);
                 return RedirectToAction(nameof(Index));
             }
             return View(owner);
@@ -68,49 +63,24 @@ namespace MyLeasing.Web.Controllers
         // GET: Owners/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var owner = await _context.Owners.FindAsync(id);
-            if (owner == null)
-            {
-                return NotFound();
-            }
+            var owner = await _ownerRepository.GetByIdAsync(id.Value);
+            if (owner == null) return NotFound();
+
             return View(owner);
         }
 
         // POST: Owners/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Document,FirstName,LastName,FixedPhone,CellPhone,Address")] Owner owner)
+        public async Task<IActionResult> Edit(int id, Owner owner)
         {
-            if (id != owner.Id)
-            {
-                return NotFound();
-            }
+            if (id != owner.Id) return NotFound();
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(owner);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!OwnerExists(owner.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                await _ownerRepository.UpdateAsync(owner);
                 return RedirectToAction(nameof(Index));
             }
             return View(owner);
@@ -119,17 +89,10 @@ namespace MyLeasing.Web.Controllers
         // GET: Owners/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var owner = await _context.Owners
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (owner == null)
-            {
-                return NotFound();
-            }
+            var owner = await _ownerRepository.GetByIdAsync(id.Value);
+            if (owner == null) return NotFound();
 
             return View(owner);
         }
@@ -139,15 +102,9 @@ namespace MyLeasing.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var owner = await _context.Owners.FindAsync(id);
-            _context.Owners.Remove(owner);
-            await _context.SaveChangesAsync();
+            var owner = await _ownerRepository.GetByIdAsync(id);
+            await _ownerRepository.DeleteAsync(owner);
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool OwnerExists(int id)
-        {
-            return _context.Owners.Any(e => e.Id == id);
         }
     }
 }
