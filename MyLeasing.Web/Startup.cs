@@ -32,6 +32,8 @@ namespace MyLeasing.Web
 
             services.AddScoped<IOwnerRepository, OwnerRepository>();
 
+            services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
 
             services.AddDbContext<DataContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));

@@ -6,6 +6,17 @@ using MyLeasing.Web.Models;
 
 namespace MyLeasing.Web.Data
 {
+    public class OwnerRepository : GenericRepository<Owner>, IOwnerRepository
+    {
+        public OwnerRepository(DataContext context) : base(context)
+        {
+        }
+
+       
+    }
+
+
+    /*
     public class OwnerRepository : IOwnerRepository
     {
         private readonly DataContext _context;
@@ -42,5 +53,7 @@ namespace MyLeasing.Web.Data
             _context.Owners.Remove(owner);
             await _context.SaveChangesAsync();
         }
-    }
+    */
+    
+
 }
